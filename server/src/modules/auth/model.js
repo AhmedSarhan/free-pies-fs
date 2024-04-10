@@ -28,6 +28,11 @@ const UserSchema = new mongoose.Schema({
     enum: [process.env.ADMIN_USER, process.env.CLIENT_USER],
     default: process.env.CLIENT_USER,
   },
+  avatar: {
+    type: String,
+    default: "https://via.placeholder.com/150",
+    required: [true, "Please Enter an avatar first"],
+  },
 });
 
 UserSchema.pre("save", async function (next) {
@@ -58,7 +63,7 @@ UserSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-UserSchema.method.createJWT = function () {
+UserSchema.methods.createJWT = function () {
   return jwt.sign(
     {
       id: this._id,

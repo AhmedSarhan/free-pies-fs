@@ -1,8 +1,8 @@
-const { User } = require('./model');
-const bcrypt = require('bcryptjs');
-
+const User = require('./model');
+const { StatusCodes } = require('http-status-codes');
 
 const registerController = async (req, res) => {
+  console.log('registerController', req.body);
   const { username, email, password } = req.body;
 
   try {
@@ -19,20 +19,27 @@ const registerController = async (req, res) => {
     });
 
   } catch (error) {
+    console.log('registerController error', error);
     res.status(500).json({ msg: error.message || 'Internal server error' });
   }
 };
 
 const loginController = async (req, res) => {
+  console.log('loginController', req.body);
   const { email, password } = req.body;
 
   try {
-    const { user } = await User.findOne(
+    const user = await User.findOne(
       { email },
       { __v: 0 },
     );
-
-    const compare = await bycrypt.compare(password, user.password);
+    console.log('user', user);
+    if (!user) {
+      return res.status(404).json({
+        msg: 'User not found, Please register first',
+      });
+    }
+    const compare = await user.comparePassword(password, user.password);
     if (!compare) {
       return res.status(401).json({
         msg: 'Incorrect Credentials, Please try again',
@@ -49,6 +56,7 @@ const loginController = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log('loginController error', error);
     res
       .status(StatusCodes.BAD_GATEWAY)
       .json({ msg: 'something went wrong please try again later' });

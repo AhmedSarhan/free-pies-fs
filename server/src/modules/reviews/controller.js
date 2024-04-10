@@ -9,6 +9,18 @@ const getReviews = async (req, res) => {
   }
 };
 
+
+const getProductReviews = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const reviews = await Review.find({ product: id }).populate("user");
+    res.status(200).json({ reviews });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+
+};
+
 const getReview = async (req, res) => {
   try {
     const { id } = req.params;
@@ -64,6 +76,7 @@ const deleteReview = async (req, res) => {
 module.exports = {
   getReviews,
   getReview,
+  getProductReviews,
   createReview,
   updateReview,
   deleteReview,
